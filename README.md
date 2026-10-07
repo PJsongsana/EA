@@ -6,7 +6,7 @@
 |---|---|---|
 | 0 | ตั้งสมมติฐานสัญญาณ | Asian Range Breakout (ตัวแรก) |
 | 1 | **EdgeTester** — EA สำหรับวัด edge | ✅ v1.10 คอมไพล์ผ่าน (รอทดสอบ) |
-| 2 | สคริปต์วิเคราะห์ CSV + เทียบ random baseline | ยังไม่เริ่ม |
+| 2 | สคริปต์วิเคราะห์ CSV + เทียบ random baseline | ✅ `analysis/edge_report.py` |
 | 3 | ทดสอบความทนทาน (พารามิเตอร์ / รายปี / spread) | ยังไม่เริ่ม |
 | 4 | เกณฑ์ผ่าน/ไม่ผ่าน | ยังไม่เริ่ม |
 | 5 | ประกอบ EA จริง + walk-forward + demo | ยังไม่เริ่ม |
@@ -16,6 +16,7 @@
 ```
 MQL5/Experts/EdgeTester/EdgeTester.mq5   EA ทดสอบ edge (เฟส 1)
 compile.bat                              คอมไพล์จาก command line
+analysis/edge_report.py                  วิเคราะห์ CSV + เทียบ random baseline (เฟส 2)
 ```
 
 ## EdgeTester ทำอะไร
@@ -64,6 +65,19 @@ EA ตัวนี้ **ไม่ได้มีไว้ทำกำไร** �
 ชื่อไฟล์: `EdgeTester_<symbol>_<signal>_<exit>_seed<N>.csv`
 
 > ตอน optimize ให้เปลี่ยนเฉพาะ `InpRandomSeed` เพราะชื่อไฟล์แยกกันด้วย seed เท่านั้น
+> ชื่อไฟล์ไม่มีช่วงวันที่ — รอบ A/B/C ต้องใช้ช่วงวันที่เดียวกัน (สคริปต์จะเตือนถ้าไม่ตรง)
+
+### วิเคราะห์ผล (เฟส 2)
+
+```
+python analysis/edge_report.py
+```
+
+- อ่าน CSV จาก `Terminal/Common/Files/` เอง (Python 3, ไม่ต้องลง package เพิ่ม)
+- รอบ A: win rate + binomial test, avgR + t-test, MFE/MAE, แยก buy/sell และรายปี
+- รอบ B/C: ตัด seed ที่เทรด < 30 ไม้, หา p5/p95 ของ avgR, บอก percentile ของรอบ A → **PASS** ถ้า ≥ 95
+- รายงาน HTML พร้อมกราฟสะสม R + histogram: `analysis/out/edge_report.html`
+- ตัวเลือก: `--exit EXIT_FIXED_BARS`, `--min-trades N`, `--dir <folder>`
 
 ---
 

@@ -3,3 +3,6 @@
 *.ex4
 *.log
 *.stackdump
+
+# edge_report.py output
+analysis/out/

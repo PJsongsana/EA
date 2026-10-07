@@ -40,7 +40,11 @@ v1.10 (หลังผู้ใช้ตรวจโครงสร้าง):
    - log เขียนเป็น `<ชื่อไฟล์>.compile.log` (UTF-16) ข้างไฟล์ต้นทาง; `.ex5` / `*.log` อยู่ใน `.gitignore`
 2. ~~ให้ผู้ใช้ตรวจโครงสร้าง EdgeTester~~ ✅ — แก้ตามผลตรวจเป็น v1.10 แล้ว
 3. รันทดสอบตามตารางรอบ A/B/C ใน `README.md` (M15, Every tick based on real ticks)
-4. เฟส 2: สคริปต์ Python อ่าน CSV จาก `Terminal/Common/Files/` → win rate + binomial test, expectancy (R), MFE/MAE, percentile ของสัญญาณจริงเทียบการกระจายจาก random seeds
+4. ~~เฟส 2: สคริปต์วิเคราะห์ CSV~~ ✅ `analysis/edge_report.py` (stdlib only — เครื่องไม่มี scipy/matplotlib)
+   - รอบ A รันแล้ว (2026-10-07, MetaQuotes-Demo, 2026-01-01→2026-10-06 real ticks): 70 ไม้, win 57.1% (p=0.28), avgR +0.142 (t=1.18) → ยังไม่ significant; buy avgR −0.005 / sell +0.280
+   - โบรกนี้มี real ticks เริ่ม 2026-01, แท่ง M15 เริ่ม 2025-01 → ตัวอย่างน้อย ต้องการ ~200 ไม้
+   - เวลา server ยืนยันจากข้อมูล: แท่งแรกของวัน 01:00 = GMT+2/+3 ตรงกับ default
+   - รอบ B/C ยังไม่ได้รัน (ผู้ใช้รันเองใน GUI — MT5 เปิดอยู่ จึงรันผ่าน command line ไม่ได้)
 5. เพิ่มสัญญาณ Trend Pullback / Donchian ใน signal module
 
 ## จุดที่ควรตรวจในโค้ด (ยังไม่ได้ยืนยันจากการรันจริง)

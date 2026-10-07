@@ -9,7 +9,7 @@
 //|  entries.                                                        |
 //+------------------------------------------------------------------+
 #property copyright "Jirayut"
-#property version   "0.10"
+#property version   "1.00"
 #property description "Edge tester: Asian Range Breakout vs random baseline"
 
 #include <Trade/Trade.mqh>

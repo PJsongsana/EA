@@ -5,7 +5,7 @@
 | เฟส | งาน | สถานะ |
 |---|---|---|
 | 0 | ตั้งสมมติฐานสัญญาณ | Asian Range Breakout (ตัวแรก) |
-| 1 | **EdgeTester** — EA สำหรับวัด edge | ✅ v0.10 (รอตรวจ) |
+| 1 | **EdgeTester** — EA สำหรับวัด edge | ✅ v1.00 คอมไพล์ผ่าน (รอตรวจ) |
 | 2 | สคริปต์วิเคราะห์ CSV + เทียบ random baseline | ยังไม่เริ่ม |
 | 3 | ทดสอบความทนทาน (พารามิเตอร์ / รายปี / spread) | ยังไม่เริ่ม |
 | 4 | เกณฑ์ผ่าน/ไม่ผ่าน | ยังไม่เริ่ม |
@@ -15,6 +15,7 @@
 
 ```
 MQL5/Experts/EdgeTester/EdgeTester.mq5   EA ทดสอบ edge (เฟส 1)
+compile.bat                              คอมไพล์จาก command line
 ```
 
 ## EdgeTester ทำอะไร
@@ -46,6 +47,7 @@ EA ตัวนี้ **ไม่ได้มีไว้ทำกำไร** �
 1. คัดลอก `MQL5/Experts/EdgeTester/` ไปไว้ที่ `<MT5 Data Folder>/MQL5/Experts/`
    (เปิดได้จาก MT5: File → Open Data Folder)
 2. เปิดใน MetaEditor แล้วกด Compile (F7)
+   หรือรัน `compile.bat` จากโฟลเดอร์ repo (หา MetaEditor + Data Folder ให้เอง, override ได้ด้วย env `METAEDITOR` / `MQL5_INCLUDE`)
 3. Strategy Tester: Symbol `XAUUSD`, Timeframe **M15**, Modelling **Every tick based on real ticks**
 
 ### ขั้นตอนทดสอบ edge

@@ -20,22 +20,20 @@
 
 | รายการ | สถานะ |
 |---|---|
-| `MQL5/Experts/EdgeTester/EdgeTester.mq5` v0.10 | เขียนเสร็จ, **ยังไม่เคยคอมไพล์** |
+| `MQL5/Experts/EdgeTester/EdgeTester.mq5` v1.00 | **คอมไพล์ผ่าน 0 error / 0 warning** (2026-10-07) |
+| `compile.bat` | เสร็จ — คอมไพล์จาก command line |
 | `README.md` (ภาษาไทย) | เสร็จ |
 | ทดสอบใน Strategy Tester | ยังไม่ได้ทำ |
 | เฟส 2 สคริปต์วิเคราะห์ CSV | ยังไม่เริ่ม |
 
-โค้ดถูกเขียนใน cloud session ที่ไม่มี MetaEditor จึงตรวจได้แค่การอ่าน ไม่ได้คอมไพล์จริง
+คอมไพล์ครั้งแรกได้ 0 error, warning เดียวคือ `#property version "0.10"` (MQL5 Market ต้องการ major ≥ 1) → เปลี่ยนเป็น `"1.00"`
+โค้ดยังไม่ได้แก้ logic ใดๆ จากที่เขียนใน cloud session
 
 ## งานถัดไป (ตามลำดับ)
 
-1. **คอมไพล์และแก้ error**
-   ```
-   "C:\Program Files\MetaTrader 5\metaeditor64.exe" /compile:"<path>\EdgeTester.mq5" /log:"compile.log"
-   ```
-   - อ่าน `compile.log` → แก้ → คอมไพล์ซ้ำจน 0 error (warning ควรเคลียร์ด้วย)
-   - ไฟล์ต้องอยู่ใต้ `<MT5 Data Folder>\MQL5\` หรือระบุ `/include:` ไม่งั้นหา `<Trade/Trade.mqh>` ไม่เจอ
-   - ทางเลือกที่ผู้ใช้อาจอยากได้: เพิ่ม `compile.bat` ใน repo (เคยเสนอไว้ ยังไม่ได้รับอนุมัติ — ถามก่อน)
+1. ~~คอมไพล์และแก้ error~~ ✅ — คอมไพล์ซ้ำด้วย `compile.bat [file.mq5]`
+   - ใช้ `/include:<MT5 Data Folder>\MQL5` จึงไม่ต้องย้ายไฟล์ไปไว้ใน Data Folder
+   - log เขียนเป็น `<ชื่อไฟล์>.compile.log` (UTF-16) ข้างไฟล์ต้นทาง; `.ex5` / `*.log` อยู่ใน `.gitignore`
 2. **ให้ผู้ใช้ตรวจโครงสร้าง EdgeTester** (กฎสัญญาณ, โหมด, input) ก่อนทำส่วนอื่น
 3. รันทดสอบตามตารางรอบ A/B/C ใน `README.md` (M15, Every tick based on real ticks)
 4. เฟส 2: สคริปต์ Python อ่าน CSV จาก `Terminal/Common/Files/` → win rate + binomial test, expectancy (R), MFE/MAE, percentile ของสัญญาณจริงเทียบการกระจายจาก random seeds

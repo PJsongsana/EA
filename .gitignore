@@ -1,0 +1,4 @@
+# MetaEditor build output
+*.ex5
+*.ex4
+*.log

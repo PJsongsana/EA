@@ -5,7 +5,7 @@
 | เฟส | งาน | สถานะ |
 |---|---|---|
 | 0 | ตั้งสมมติฐานสัญญาณ | Asian Range Breakout (ตัวแรก) |
-| 1 | **EdgeTester** — EA สำหรับวัด edge | ✅ v1.00 คอมไพล์ผ่าน (รอตรวจ) |
+| 1 | **EdgeTester** — EA สำหรับวัด edge | ✅ v1.10 คอมไพล์ผ่าน (รอทดสอบ) |
 | 2 | สคริปต์วิเคราะห์ CSV + เทียบ random baseline | ยังไม่เริ่ม |
 | 3 | ทดสอบความทนทาน (พารามิเตอร์ / รายปี / spread) | ยังไม่เริ่ม |
 | 4 | เกณฑ์ผ่าน/ไม่ผ่าน | ยังไม่เริ่ม |
@@ -25,13 +25,13 @@ EA ตัวนี้ **ไม่ได้มีไว้ทำกำไร** �
 - **Signal mode**
   - `SIGNAL_REAL` — สัญญาณจริง: Asian Range Breakout
   - `SIGNAL_RANDOM_DIRECTION` — เข้า *เวลาเดียวกับสัญญาณจริง* แต่สุ่มทิศ → ทดสอบว่าการเลือกทิศมี edge ไหม
-  - `SIGNAL_RANDOM_TIME` — สุ่มเวลาในช่วงเทรด + สุ่มทิศ → baseline แบบสุ่มล้วน
+  - `SIGNAL_RANDOM_TIME` — เฉพาะวันที่กรอบเอเชียผ่านตัวกรอง (วันเดียวกับที่สัญญาณจริงพิจารณา) สุ่ม 1 แท่งแบบ uniform ในช่วงเทรด + สุ่มทิศ → ทดสอบว่า *จังหวะเวลา* ของ breakout มี edge ไหม
 - **Exit mode**
   - `EXIT_ATR_SYMMETRIC` — SL = TP = k×ATR (1:1) → win rate อ่านได้ตรงๆ (> 50% = มี edge)
   - `EXIT_FIXED_BARS` — ปิดหลัง N แท่ง ไม่มี SL/TP → ดูผลเฉลี่ยหน่วย ATR
 - ล็อตคงที่, เทรดไม่เกินวันละ 1 ไม้, ข้ามเมื่อ spread กว้างเกินกำหนด
 - บันทึกทุกเทรดลง CSV (หน่วย R / ATR, MFE, MAE, spread ตอนเข้า)
-- `OnTester()` คืนค่า **avgR** (ผลเฉลี่ยต่อเทรดหน่วย R) เป็น custom criterion
+- `OnTester()` คืนค่า **avgR** (ผลเฉลี่ยต่อเทรดหน่วย R) เป็น custom criterion — คืน 0 ถ้าเทรดน้อยกว่า `InpMinTradesForScore` (ตัด seed เหล่านี้ออกก่อนคิด percentile)
 
 ### Asian Range Breakout (กฎ)
 

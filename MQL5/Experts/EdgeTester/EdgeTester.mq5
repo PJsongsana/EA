@@ -9,7 +9,7 @@
 //|  entries.                                                        |
 //+------------------------------------------------------------------+
 #property copyright "Jirayut"
-#property version   "1.00"
+#property version   "1.10"
 #property description "Edge tester: Asian Range Breakout vs random baseline"
 
 #include <Trade/Trade.mqh>
@@ -19,7 +19,7 @@ enum ENUM_SIGNAL_MODE
   {
    SIGNAL_REAL             = 0, // Real signal (Asian Range Breakout)
    SIGNAL_RANDOM_DIRECTION = 1, // Same entry times, random direction
-   SIGNAL_RANDOM_TIME      = 2  // Random time inside trade window, random direction
+   SIGNAL_RANDOM_TIME      = 2  // Same valid days, one random bar in trade window, random direction
   };
 
 enum ENUM_EXIT_MODE
@@ -33,7 +33,6 @@ input group "=== Mode ==="
 input ENUM_SIGNAL_MODE InpSignalMode     = SIGNAL_REAL;
 input ENUM_EXIT_MODE   InpExitMode       = EXIT_ATR_SYMMETRIC;
 input int              InpRandomSeed     = 1;     // Seed (optimize 1..N for random baseline)
-input double           InpRandomTimeProb = 0.10;  // Entry probability per bar (RANDOM_TIME)
 
 input group "=== Asian Range Breakout (BROKER SERVER TIME) ==="
 input int    InpAsiaStartHour   = 1;    // Asia range start hour (server)
@@ -73,6 +72,7 @@ struct DayState
    double            hi;
    double            lo;
    bool              traded;
+   datetime          randBar;      // RANDOM_TIME: open time of the bar to enter after
   };
 
 struct TradeState
@@ -107,6 +107,11 @@ int OnInit()
       InpTradeStartHour < 0 || InpTradeStartHour > 23 || InpTradeEndHour < 0 || InpTradeEndHour > 24)
      {
       Print("Invalid hour inputs");
+      return(INIT_PARAMETERS_INCORRECT);
+     }
+   if(InpAsiaStartHour == InpAsiaEndHour || InpTradeStartHour == InpTradeEndHour % 24)
+     {
+      Print("Asia / trade window must not be empty or a full day (start == end)");
       return(INIT_PARAMETERS_INCORRECT);
      }
    if(InpExitBars < 1 || InpSlTpAtr <= 0.0 || InpLots <= 0.0)
@@ -266,6 +271,16 @@ void BuildRange(const datetime asiaStart, const datetime asiaEnd, const double a
    g_day.hi = hi;
    g_day.lo = lo;
    g_day.rangeValid = true;
+
+   // RANDOM_TIME: draw one uniformly random bar of today's trade window,
+   // only on days the real signal would also consider (valid range)
+   if(InpSignalMode == SIGNAL_RANDOM_TIME)
+     {
+      int barSec  = PeriodSeconds(_Period);
+      int winSec  = ((InpTradeEndHour - InpTradeStartHour + 24) % 24) * 3600;
+      int winBars = MathMax(winSec / barSec, 1);
+      g_day.randBar = g_day.key + InpTradeStartHour * 3600 + RandomInt(winBars) * barSec;
+     }
   }
 
 double GetAtr()
@@ -295,6 +310,12 @@ int RandomDirection()
    return((MathRand() % 2 == 0) ? +1 : -1);
   }
 
+// uniform integer in [0, n), n <= 32768
+int RandomInt(const int n)
+  {
+   return((int)(MathRand() / 32768.0 * n));
+  }
+
 int GetEntryDirection(const double atr)
   {
    switch(InpSignalMode)
@@ -309,7 +330,8 @@ int GetEntryDirection(const double atr)
          return(0);
 
       case SIGNAL_RANDOM_TIME:
-         if(MathRand() / 32767.0 < InpRandomTimeProb)
+         // enter on the first closed bar at/after the drawn bar (handles missing bars)
+         if(g_day.rangeValid && iTime(_Symbol, _Period, 1) >= g_day.randBar)
             return(RandomDirection());
          return(0);
      }
@@ -337,8 +359,10 @@ void OpenTrade(const int dir, const double atr)
    if(InpExitMode == EXIT_ATR_SYMMETRIC)
      {
       riskDist = InpSlTpAtr * atr;
+      // SL is measured from the opposite side of the spread (buy SL vs bid,
+      // sell SL vs ask), so its effective distance is riskDist - spread
       double minDist = (double)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_STOPS_LEVEL) * _Point;
-      if(riskDist <= minDist)
+      if(riskDist - (ask - bid) <= minDist)
         {
          Print("SL/TP distance below broker stops level, skip");
          return;
